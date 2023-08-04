@@ -1,2 +1,3 @@
-# hive.py
-Ethereum Hive Simulators Python Library
+# Ethereum Hive Simulators Python Library
+
+Write hive simulators using python
