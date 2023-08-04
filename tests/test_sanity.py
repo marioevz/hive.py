@@ -2,7 +2,7 @@ from re import match
 
 from hive.parameters import Parameter
 from hive.simulation import Simulation
-from hive.tests import TestResult
+from hive.testing import HiveTestResult
 
 
 def test_sanity():
@@ -50,5 +50,5 @@ def test_sanity():
 
     n.connect_client(c2)
 
-    t.end(result=TestResult(test_pass=True, details="some details"))
+    t.end(result=HiveTestResult(test_pass=True, details="some details"))
     suite.end()

@@ -4,7 +4,7 @@ from typing import List
 import requests
 
 from .client import ClientType
-from .tests import TestSuite
+from .testing import HiveTestSuite
 
 # from enode import enode
 
@@ -38,9 +38,9 @@ class Simulation:
         return se, te
     """
 
-    def start_suite(self, name: str, description: str) -> TestSuite:
+    def start_suite(self, name: str, description: str) -> HiveTestSuite:
         url = f"{self.url}/testsuite"
-        return TestSuite.start(url=url, name=name, description=description)
+        return HiveTestSuite.start(url=url, name=name, description=description)
 
     def client_types(self) -> List[ClientType]:
         url = f"{self.url}/clients"

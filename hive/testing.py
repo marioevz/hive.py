@@ -9,14 +9,14 @@ from .network import Network
 
 
 @dataclass(kw_only=True)
-class TestSuite:
+class HiveTestSuite:
     url: str
     name: str
     description: str
     id: int
 
     @classmethod
-    def start(cls, url: str, name: str, description: str) -> "TestSuite":
+    def start(cls, url: str, name: str, description: str) -> "HiveTestSuite":
         req = {"Name": name, "Description": description}
         response = requests.post(url, json=req)
         response.raise_for_status()
@@ -27,9 +27,9 @@ class TestSuite:
         response = requests.delete(self.url)
         response.raise_for_status()
 
-    def start_test(self, name: str, description: str) -> "Test":
+    def start_test(self, name: str, description: str) -> "HiveTest":
         url = f"{self.url}/test"
-        return Test.start(url=url, name=name, description=description)
+        return HiveTest.start(url=url, name=name, description=description)
 
     def create_network(self, name):  # -> Network:
         url = f"{self.url}/network"
@@ -37,7 +37,7 @@ class TestSuite:
 
 
 @dataclass(kw_only=True)
-class TestResult:
+class HiveTestResult:
     test_pass: bool
     details: str
 
@@ -48,21 +48,21 @@ class TestResult:
 
 
 @dataclass(kw_only=True)
-class Test:
+class HiveTest:
     url: str
     name: str
     description: str
     id: int
 
     @classmethod
-    def start(cls, url: str, name: str, description: str) -> "Test":
+    def start(cls, url: str, name: str, description: str) -> "HiveTest":
         req = {"Name": name, "Description": description}
         response = requests.post(url, json=req)
         response.raise_for_status()
         id = response.json()
         return cls(url=f"{url}/{id}", name=name, description=description, id=id)
 
-    def end(self, result: TestResult):
+    def end(self, result: HiveTestResult):
         response = requests.post(self.url, json=result.to_dict())
         response.raise_for_status()
 
