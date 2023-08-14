@@ -1,5 +1,5 @@
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass
 from http import client
 from io import BufferedReader, BytesIO
 from ipaddress import IPv4Address, IPv6Address, ip_address
@@ -9,33 +9,41 @@ import requests
 
 
 @dataclass(kw_only=True)
-class ClientConfig:
-    client: str
-    networks: List[str] = field(default_factory=list)
-    environment: Mapping[str, str] = field(default_factory=dict)
+class ClientType:
+    name: str
+    version: str
+    meta: Dict[str, Any]
 
 
 @dataclass(kw_only=True)
-class ClientSetup:
-    config: ClientConfig
-    files: Mapping[str, str | bytes | BufferedReader] = field(default_factory=dict)
+class ClientConfig:
+    client_type: ClientType
+    networks: List[str] | None = None
+    environment: Mapping[str, str] | None = None
+    files: Mapping[str, str | bytes | BufferedReader] | None = None
 
     def post_with_files(self, url) -> Tuple[int, Mapping[str, str] | str | None]:
         # Create the dictionary of files to send.
         files = {}
-        for filename, open_fn_or_name in self.files.items():
-            if isinstance(open_fn_or_name, bytes):
-                open_fn_or_name = BytesIO(open_fn_or_name)  # type: ignore
-            if isinstance(open_fn_or_name, str):
-                open_fn_or_name = open(open_fn_or_name, "rb")
-            assert isinstance(open_fn_or_name, BufferedReader)
-            files["file"] = (filename, open_fn_or_name)
+        if self.files is not None:
+            for filename, open_fn_or_name in self.files.items():
+                if isinstance(open_fn_or_name, bytes):
+                    open_fn_or_name = BytesIO(open_fn_or_name)  # type: ignore
+                if isinstance(open_fn_or_name, str):
+                    open_fn_or_name = open(open_fn_or_name, "rb")
+                assert isinstance(open_fn_or_name, BufferedReader)
+                files["file"] = (filename, open_fn_or_name)
 
         # Send the request.
+        config_dict = {
+            "client": self.client_type.name,
+            "networks": self.networks if self.networks is not None else [],
+            "environment": self.environment if self.environment is not None else {},
+        }
         response = requests.post(
             url,
             data={
-                "config": json.dumps(asdict(self.config)),
+                "config": json.dumps(config_dict),
             },
             files=files,
         )
@@ -48,13 +56,6 @@ class ClientSetup:
             return response.status_code, response_json
         except Exception as e:
             return response.status_code, str(e)
-
-
-@dataclass(kw_only=True)
-class ClientType:
-    name: str
-    version: str
-    meta: Dict[str, Any]
 
 
 @dataclass(kw_only=True)
@@ -95,32 +96,32 @@ class ClientEnode:
 @dataclass(kw_only=True)
 class Client:
     url: str
-    type: ClientType
+    config: ClientConfig
     id: str
     ip: str
 
     @classmethod
     def start(
         cls,
+        *,
         url,
-        client_type: ClientType,
-        parameters: Mapping[str, str],
-        files: Mapping[str, str | bytes | BufferedReader],
+        **kwargs,
     ):
-        client_config = ClientConfig(client=client_type.name, environment=parameters)
-        setup = ClientSetup(
-            config=client_config,
-            files=files,
-        )
+        if "client_config" in kwargs:
+            client_config = kwargs.pop("client_config")
+            assert isinstance(client_config, ClientConfig)
+            assert len(kwargs) == 0
+        else:
+            client_config = ClientConfig(**kwargs)
 
-        errcode, resp = setup.post_with_files(url)
+        errcode, resp = client_config.post_with_files(url)
 
         if resp is None or errcode != 200:
             return None
 
         assert not isinstance(resp, str)
 
-        return cls(url=url, type=client_type, **resp)
+        return cls(url=url, config=client_config, **resp)
 
     def stop(self):
         url = f"{self.url}/{self.id}"

@@ -1,10 +1,8 @@
 from dataclasses import asdict, dataclass
-from io import BufferedReader
-from typing import Mapping
 
 import requests
 
-from .client import Client, ClientType
+from .client import Client
 from .network import Network
 
 
@@ -55,22 +53,17 @@ class HiveTest:
     id: int
 
     @classmethod
-    def start(cls, url: str, name: str, description: str) -> "HiveTest":
+    def start(cls, *, url: str, name: str, description: str) -> "HiveTest":
         req = {"Name": name, "Description": description}
         response = requests.post(url, json=req)
         response.raise_for_status()
         id = response.json()
         return cls(url=f"{url}/{id}", name=name, description=description, id=id)
 
-    def end(self, result: HiveTestResult):
+    def end(self, *, result: HiveTestResult):
         response = requests.post(self.url, json=result.to_dict())
         response.raise_for_status()
 
-    def start_client(
-        self,
-        client_type: ClientType,
-        parameters: Mapping[str, str],
-        files: Mapping[str, str | bytes | BufferedReader],
-    ) -> Client | None:
-        url = f"{self.url}/node"
-        return Client.start(url=url, client_type=client_type, parameters=parameters, files=files)
+    def start_client(self, **kwargs) -> Client | None:
+        kwargs["url"] = f"{self.url}/node"
+        return Client.start(**kwargs)

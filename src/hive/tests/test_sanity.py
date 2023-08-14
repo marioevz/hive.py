@@ -22,7 +22,7 @@ def test_sanity():
 
     c1 = t.start_client(
         client_type=clients[0],
-        parameters={},
+        environment={},
         files={
             "genesis.json": os.path.join("src", "hive", "tests", "genesis.json"),
         },
@@ -41,7 +41,7 @@ def test_sanity():
 
     c2 = t.start_client(
         client_type=clients[0],
-        parameters={
+        environment={
             Parameter.Bootnode: str(enode),
         },
         files={
