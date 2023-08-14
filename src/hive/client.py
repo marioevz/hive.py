@@ -1,5 +1,6 @@
 import json
 from dataclasses import dataclass
+from enum import Enum
 from http import client
 from io import BufferedReader, BytesIO
 from ipaddress import IPv4Address, IPv6Address, ip_address
@@ -8,11 +9,24 @@ from typing import Any, Dict, List, Mapping, Tuple
 import requests
 
 
+class ClientRole(str, Enum):
+    ExecutionClient = "eth1"
+    BeaconClient = "beacon"
+    ValidatorClient = "validator"
+
+
 @dataclass(kw_only=True)
 class ClientType:
     name: str
     version: str
     meta: Dict[str, Any]
+
+    def roles(self) -> List[str]:
+        roles = []
+        if "roles" in self.meta:
+            roles = self.meta["roles"]
+            assert isinstance(roles, list)
+        return roles
 
 
 @dataclass(kw_only=True)

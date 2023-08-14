@@ -14,7 +14,7 @@ go build -v .
 
 #### Run hive in dev mode
 ```bash
-./hive --dev
+./hive --dev --client go-ethereum,lighthouse-bn,lighthouse-vc
 ```
 
 #### Run tests
