@@ -1,3 +1,4 @@
+import os
 from re import match
 
 from hive.parameters import Parameter
@@ -23,7 +24,7 @@ def test_sanity():
         client_type=clients[0],
         parameters={},
         files={
-            "genesis.json": "./tests/genesis.json",
+            "genesis.json": os.path.join("src", "hive", "tests", "genesis.json"),
         },
     )
 
@@ -44,7 +45,7 @@ def test_sanity():
             Parameter.Bootnode: str(enode),
         },
         files={
-            "genesis.json": "./tests/genesis.json",
+            "genesis.json": os.path.join("src", "hive", "tests", "genesis.json"),
         },
     )
 
