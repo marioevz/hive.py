@@ -1,14 +1,22 @@
 import os
 from re import match
 
+import pytest
+
+from hive.client import ClientRole
 from hive.parameters import Parameter
 from hive.simulation import Simulation
 from hive.testing import HiveTestResult
 
 
-def test_sanity():
-    sim = Simulation(url="http://127.0.0.1:3000")
+@pytest.fixture
+def sim():
+    # TODO: Start hive in dev mode here
+    yield Simulation(url="http://127.0.0.1:3000")
+    # TODO: Clean it up here
 
+
+def test_sanity(sim: Simulation):
     clients = sim.client_types()
 
     assert clients
@@ -27,6 +35,7 @@ def test_sanity():
             "genesis.json": os.path.join("src", "hive", "tests", "genesis.json"),
         },
     )
+    assert c1 is not None
 
     # Check enode
     enode = c1.enode()
@@ -53,3 +62,20 @@ def test_sanity():
 
     t.end(result=HiveTestResult(test_pass=True, details="some details"))
     suite.end()
+
+
+def test_clients_by_role(sim: Simulation):
+    execution_clients = sim.client_types(role=ClientRole.ExecutionClient)
+    assert len(execution_clients) == 1, "Expected 1 execution client, got {}".format(
+        len(execution_clients)
+    )
+
+    beacon_clients = sim.client_types(role=ClientRole.BeaconClient)
+    assert len(beacon_clients) == 1, "Expected 1 execution client, got {}".format(
+        len(beacon_clients)
+    )
+
+    validator_clients = sim.client_types(role=ClientRole.ValidatorClient)
+    assert len(validator_clients) == 1, "Expected 1 execution client, got {}".format(
+        len(validator_clients)
+    )

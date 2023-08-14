@@ -3,7 +3,7 @@ from typing import List
 
 import requests
 
-from .client import ClientType
+from .client import ClientRole, ClientType
 from .testing import HiveTestSuite
 
 # from enode import enode
@@ -42,10 +42,13 @@ class Simulation:
         url = f"{self.url}/testsuite"
         return HiveTestSuite.start(url=url, name=name, description=description)
 
-    def client_types(self) -> List[ClientType]:
+    def client_types(self, *, role: ClientRole | None = None) -> List[ClientType]:
         url = f"{self.url}/clients"
         response = requests.get(url)
         response.raise_for_status()
         client_list = response.json()
         assert isinstance(client_list, list)
-        return [ClientType(**x) for x in client_list]
+        clients = [ClientType(**x) for x in client_list]
+        if role:
+            return [c for c in clients if role in c.roles()]
+        return clients
