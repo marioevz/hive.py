@@ -46,7 +46,7 @@ class ClientConfig:
                 if isinstance(open_fn_or_name, str):
                     open_fn_or_name = open(open_fn_or_name, "rb")
                 assert isinstance(open_fn_or_name, BufferedReader)
-                files["file"] = (filename, open_fn_or_name)
+                files[filename] = open_fn_or_name
 
         # Send the request.
         config_dict = {
