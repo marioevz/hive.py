@@ -9,7 +9,7 @@ client:
 
 ```shell
 ./hive --dev --client go-ethereum,lighthouse-bn,lighthouse-vc --client-file \
-    configs/cancun.yaml --docker.output
+    --docker.output
 ```
 """
 
