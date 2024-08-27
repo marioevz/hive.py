@@ -1,3 +1,18 @@
+"""
+Sanity tests for the Hive simulation framework.
+
+Requirements
+------------
+
+Start a hive simulator in dev mode with an execution, beacon and validator
+client:
+
+```shell
+./hive --dev --client go-ethereum,lighthouse-bn,lighthouse-vc --client-file \
+    configs/cancun.yaml --docker.output
+```
+"""
+
 import os
 from re import match
 
