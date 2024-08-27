@@ -1,3 +1,18 @@
+"""
+Sanity tests for the Hive simulation framework.
+
+Requirements
+------------
+
+Start a hive simulator in dev mode with an execution, beacon and validator
+client:
+
+```shell
+./hive --dev --client go-ethereum,lighthouse-bn,lighthouse-vc --client-file \
+    --docker.output
+```
+"""
+
 import os
 from re import match
 
@@ -71,11 +86,11 @@ def test_clients_by_role(sim: Simulation):
     )
 
     beacon_clients = sim.client_types(role=ClientRole.BeaconClient)
-    assert len(beacon_clients) == 1, "Expected 1 execution client, got {}".format(
+    assert len(beacon_clients) == 1, "Expected 1 consensus client, got {}".format(
         len(beacon_clients)
     )
 
     validator_clients = sim.client_types(role=ClientRole.ValidatorClient)
-    assert len(validator_clients) == 1, "Expected 1 execution client, got {}".format(
+    assert len(validator_clients) == 1, "Expected 1 validator client, got {}".format(
         len(validator_clients)
     )
