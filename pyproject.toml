@@ -2,6 +2,38 @@
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "hive.py"
+description = "Ethereum Hive Simulators Python Interface"
+readme = "README.md"
+version = "0.1.0"
+urls = { "Homepage" = "https://github.com/marioevz/hive.py" }
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: GPL3 License",
+    "Programming Language :: Python :: 3.10",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31.0,<3"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.4.0,<8",
+    "pytest-cov>=4.1.0,<5"
+]
+lint = [
+    "black==22.3.0; implementation_name == 'cpython'",
+    "isort>=5.8,<6",
+    "mypy>=1.4.1,<2",
+    "types-requests>=2.25.0,<3"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["*tests*"]
+
 [tool.isort]
 profile = "black"
 multi_line_output = 3
@@ -9,3 +41,4 @@ line_length = 99
 
 [tool.black]
 line-length = 99
+target-version = ["py310"]
