@@ -52,3 +52,10 @@ class Simulation:
         if role:
             return [c for c in clients if role in c.roles()]
         return clients
+
+    def hive_instance(self) -> dict:
+        """Return information about the Hive instance."""
+        url = f"{self.url}/hive"
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
